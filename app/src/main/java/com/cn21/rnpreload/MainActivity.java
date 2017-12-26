@@ -1,5 +1,8 @@
 package com.cn21.rnpreload;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.cn21.rnpreloadlib.RNCacheViewManager;
+import com.facebook.react.ReactRootView;
 
 import static com.cn21.rnpreloadlib.RNCacheViewManager.REQUEST_OVERLAY_PERMISSION_CODE;
 
@@ -42,10 +46,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);    //处理调试模式下悬浮窗权限被授予回调
         if (requestCode == REQUEST_OVERLAY_PERMISSION_CODE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Settings.canDrawOverlays(this)) {
-            Toast.makeText(this, "预加载已生效，请重新打开应用！", Toast.LENGTH_SHORT).show();
-            finish();
+            restartApp();
         }
+    }
 
+    /**
+     * 重启应用以使预加载生效
+     */
+    private void restartApp() {
+        Intent mStartActivity = new Intent(this, MainActivity.class);
+        int mPendingIntentId = 123456;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(this, mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 10, mPendingIntent);
+        System.exit(0);
     }
 
 }
