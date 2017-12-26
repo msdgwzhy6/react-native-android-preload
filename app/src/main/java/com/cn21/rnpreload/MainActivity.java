@@ -37,7 +37,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("MainActivity onDestroy");
         //销毁预加载的RN模块
         RNCacheViewManager.onDestroy();
     }
