@@ -24,31 +24,43 @@ import java.util.WeakHashMap;
  */
 
 public class RNCacheViewManager {
-    public static Map<String, ReactRootView> CACHE;
+    public Map<String, ReactRootView> CACHE;
     public static final int REQUEST_OVERLAY_PERMISSION_CODE = 1111;
     public static final String REDBOX_PERMISSION_MESSAGE =
             "Overlay permissions needs to be granted in order for react native apps to run in dev mode";
 
-    public static ReactRootView getRootView(String moduleName) {
+    private RNCacheViewManager() {
+    }
+
+    private static class SingletonHolder {
+        private final static RNCacheViewManager INSTANCE = new RNCacheViewManager();
+    }
+
+    public static RNCacheViewManager getInstance() {
+        return SingletonHolder.INSTANCE;
+    }
+
+    public ReactRootView getRootView(String moduleName) {
         if (CACHE == null) return null;
         return CACHE.get(moduleName);
     }
 
-    public static ReactNativeHost getReactNativeHost(Activity activity) {
+    public ReactNativeHost getReactNativeHost(Activity activity) {
         return ((ReactApplication) activity.getApplication()).getReactNativeHost();
     }
 
     /**
      * 预加载所需的RN模块
-     * @param activity 预加载时所在的Activity
+     *
+     * @param activity      预加载时所在的Activity
      * @param launchOptions 启动参数
-     * @param moduleNames 预加载模块名
-     * 建议在主界面onCreate方法调用，最好的情况是主界面在应用运行期间一直存在不被关闭
+     * @param moduleNames   预加载模块名
+     *                      建议在主界面onCreate方法调用，最好的情况是主界面在应用运行期间一直存在不被关闭
      */
-    public static void init(Activity activity, Bundle launchOptions, String... moduleNames) {
+    public void init(Activity activity, Bundle launchOptions, String... moduleNames) {
         if (CACHE == null) CACHE = new WeakHashMap<>();
         boolean needsOverlayPermission = false;
-        if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
+        if (getReactNativeHost(activity).getUseDeveloperSupport() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(activity)) {
             needsOverlayPermission = true;
             Intent serviceIntent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + activity.getPackageName()));
             FLog.w(ReactConstants.TAG, REDBOX_PERMISSION_MESSAGE);
@@ -64,7 +76,7 @@ public class RNCacheViewManager {
                         moduleName,
                         launchOptions);
                 CACHE.put(moduleName, rootView);
-                FLog.i(ReactConstants.TAG, moduleName+" has preload");
+                FLog.i(ReactConstants.TAG, moduleName + " has preload");
             }
         }
     }
@@ -74,7 +86,7 @@ public class RNCacheViewManager {
      *
      * @param componentName
      */
-    public static void onDestroyOne(String componentName) {
+    public void onDestroyOne(String componentName) {
         try {
             ReactRootView reactRootView = CACHE.get(componentName);
             if (reactRootView != null) {
@@ -93,7 +105,7 @@ public class RNCacheViewManager {
      * 销毁全部RN模块
      * 建议在主界面onDestroy方法调用
      */
-    public static void onDestroy() {
+    public void onDestroy() {
         try {
             for (Map.Entry<String, ReactRootView> entry : CACHE.entrySet()) {
                 ReactRootView reactRootView = entry.getValue();
@@ -102,7 +114,7 @@ public class RNCacheViewManager {
                     ((android.view.ViewGroup) parent).removeView(reactRootView);
                 }
                 reactRootView.unmountReactApplication();
-                reactRootView=null;
+                reactRootView = null;
             }
             CACHE.clear();
             CACHE = null;

@@ -22,7 +22,7 @@ public abstract class C3ReactFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        mReactRootView = RNCacheViewManager.getRootView(getMainComponentName());
+        mReactRootView = RNCacheViewManager.getInstance().getRootView(getMainComponentName());
     }
 
     @Nullable

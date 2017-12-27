@@ -9,10 +9,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Toast;
 
 import com.cn21.rnpreloadlib.RNCacheViewManager;
-import com.facebook.react.ReactRootView;
 
 import static com.cn21.rnpreloadlib.RNCacheViewManager.REQUEST_OVERLAY_PERMISSION_CODE;
 
@@ -23,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //进行预加载
-        RNCacheViewManager.init(this, null, PreLoadRNActivity.COMPONENT_NAME, PreLoadRNFragment.COMPONENT_NAME);
+        RNCacheViewManager.getInstance().init(this, null, PreLoadRNFragment.COMPONENT_NAME, PreLoadRNActivity.COMPONENT_NAME);
     }
 
     public void gotoRNActivity(View view) {
@@ -42,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         //销毁预加载的RN模块
-        RNCacheViewManager.onDestroy();
+        RNCacheViewManager.getInstance().onDestroy();
     }
 
     @Override

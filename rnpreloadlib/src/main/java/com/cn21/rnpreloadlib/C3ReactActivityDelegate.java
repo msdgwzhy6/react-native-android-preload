@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 public class C3ReactActivityDelegate extends ReactActivityDelegate {
     private Activity mActivity;
     private String mainComponentName;
+    private ReactRootView reactRootView;
 
     public C3ReactActivityDelegate(Activity activity, @Nullable String mainComponentName) {
         super(activity, mainComponentName);
@@ -59,6 +60,8 @@ public class C3ReactActivityDelegate extends ReactActivityDelegate {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        reactRootView.unmountReactApplication();
+        reactRootView=null;
     }
 
     @Override
@@ -72,16 +75,22 @@ public class C3ReactActivityDelegate extends ReactActivityDelegate {
             FLog.e(ReactConstants.TAG, "mainComponentName must not be null!");
             return;
         }
-        ReactRootView reactRootView = RNCacheViewManager.getRootView(mainComponentName);
+        reactRootView = RNCacheViewManager.getInstance().getRootView(mainComponentName);
         try {
-            if (reactRootView != null) {
-                ViewParent viewParent = reactRootView.getParent();
-                if (viewParent != null) {
-                    ViewGroup vp = (ViewGroup) viewParent;
-                    vp.removeView(reactRootView);
-                }
-                mActivity.setContentView(reactRootView);
+            if (reactRootView == null) {
+                // 2.缓存中不存在RootView,直接创建
+                reactRootView = new ReactRootView(mActivity);
+                reactRootView.startReactApplication(
+                        getReactInstanceManager(),
+                        mainComponentName,
+                        null);
             }
+            ViewParent viewParent = reactRootView.getParent();
+            if (viewParent != null) {
+                ViewGroup vp = (ViewGroup) viewParent;
+                vp.removeView(reactRootView);
+            }
+            mActivity.setContentView(reactRootView);
         } catch (Exception e) {
             e.printStackTrace();
         }
