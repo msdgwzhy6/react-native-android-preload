@@ -32,8 +32,4 @@ public abstract class C3ReactFragment extends Fragment {
         return mReactRootView;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
 }

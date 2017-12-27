@@ -30,5 +30,20 @@ class ExampleFragment extends Component{
         );
     }
 }
+
+class MyFragment extends Component{
+    componentDidMount(){
+        console.log('MyFragment componentDidMount')
+    }
+    render(){
+        return(
+            <View>
+                <Text>this is React Native not Preload Fragment Page</Text>
+            </View>
+        );
+    }
+}
+
 AppRegistry.registerComponent('PreLoadRNActivity', () => ExampleActivity);
 AppRegistry.registerComponent('PreLoadRNFragment', () => ExampleFragment);
+AppRegistry.registerComponent('MyFragment', () => MyFragment);

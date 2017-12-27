@@ -34,6 +34,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, PreloadRNFragmentActivity.class));
     }
 
+    public void gotoRNFragment2(View view) {
+        startActivity(new Intent(this, MyFragmentActivity.class));
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
